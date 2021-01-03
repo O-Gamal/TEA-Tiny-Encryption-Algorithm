@@ -11,6 +11,7 @@ using namespace std;
  */
 void encrypt(uint32_t* values, uint32_t* key) {
     // TODO: write this function.
+
 }
 
 
@@ -23,6 +24,7 @@ void encrypt(uint32_t* values, uint32_t* key) {
  */
 void decrypt(uint32_t* values, uint32_t* key) {
     // TODO: write this function.
+
 }
 
 
@@ -35,6 +37,7 @@ void decrypt(uint32_t* values, uint32_t* key) {
  */
 void combine(unsigned char* str, uint32_t* values){
     // TODO: write this function.
+
 }
 
 
@@ -48,6 +51,7 @@ void combine(unsigned char* str, uint32_t* values){
  */
 string split(uint32_t* values){
     // TODO: write this function.
+
     string splitOut = ""
 
     return splitOut;

@@ -52,8 +52,20 @@ void combine(unsigned char* str, uint32_t* values){
 string split(uint32_t* values){
     // TODO: write this function.
 
-    string splitOut = ""
+    string splitOut = "";
+	
+	// splitting the first 4 chars from values[0] to splitOut string
+    splitOut += (unsigned char)(values[0] & 0xFF);
+    splitOut += (unsigned char)(values[0] >> 8);
+    splitOut += (unsigned char)(values[0] >> 16);
+    splitOut += (unsigned char)(values[0] >> 24);
 
+    // splitting the second 4 chars from values[1] to splitOut string
+    splitOut += (unsigned char)(values[1] & 0xFF);
+    splitOut += (unsigned char)(values[1] >> 8);
+    splitOut += (unsigned char)(values[1] >> 16);
+    splitOut += (unsigned char)(values[1] >> 24);
+	
     return splitOut;
 }
 

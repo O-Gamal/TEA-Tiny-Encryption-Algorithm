@@ -143,7 +143,18 @@ void TEA(string str, uint32_t* key)
  */
 int main(){
     // TODO: write this function.
+	string input= "";
 	uint32_t key[4] = {0,0,0,0};
-	TEA("test!@#$", key);
 
+	cout<<"Enter 8 characters: ";
+	getline(cin,input);
+
+	cout<<"Enter a 4 digits key: ";
+    for(int i = 0 ; i < 4 ; i++)
+    {
+        cin>>key[i];
+    }
+    TEA(input, key);
+
+	return 0;
 }

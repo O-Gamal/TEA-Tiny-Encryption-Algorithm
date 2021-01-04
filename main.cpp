@@ -59,8 +59,10 @@ void decrypt(uint32_t* values, uint32_t* key) {
  */
 void combine(unsigned char* str, uint32_t* values){
     // TODO: write this function.
-
+	values[0] = str[0] | str[1] << 8 | str[2] << 16 | str[3] << 24;
+    values[1] = str[4] | str[5] << 8 | str[6] << 16 | str[7] << 24;
 }
+
 
 
 

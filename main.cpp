@@ -96,6 +96,42 @@ string split(uint32_t* values){
 
 
 /**
+ * This function works as a driver for all other functions to prevent duplicated code
+ *
+ * Convert user input (string contains 8 chars) to char array and pass it to combine function
+ * Encrypt the 8 characters (64-bit block) using the 4 digits keys (128-bit block)
+ * Display the encrypted message
+ *
+ * Decrypt the 8 characters (64-bit block) again using the 4 digits keys (128-bit block)
+ * Display the decrypted message
+ *
+ * @param str - The user input
+ * @param key - uint32_t array of size 4 (128-bit key)
+ */
+void TEA(string str, uint32_t* key)
+{
+    uint32_t values[2];
+    unsigned char message[9] = "";
+
+    for(int i = 0 ; i < 2 ; i++)
+    {
+        //converting user input to char array
+        for (int i = 0; i < 8; i++) {
+            message[i] = str[i];
+        }
+
+        combine(message, values);
+        i == 0 ? encrypt(values, key) : decrypt(values, key);
+        str = split(values);
+
+        i == 0 ? cout<<"Encrypted: " : cout<<"Decrypted: ";
+        cout<<str<<endl;
+    }
+}
+
+
+
+/**
  * Read 8 characters from the user
  * Read 4 digits key from the user
  *
@@ -107,5 +143,7 @@ string split(uint32_t* values){
  */
 int main(){
     // TODO: write this function.
+	uint32_t key[4] = {0,0,0,0};
+	TEA("test!@#$", key);
 
 }

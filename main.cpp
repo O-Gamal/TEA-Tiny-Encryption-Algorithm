@@ -34,9 +34,9 @@ void encrypt(uint32_t* values, uint32_t* key) {
  */
 void decrypt(uint32_t* values, uint32_t* key) {
     // TODO: write this function.
-    
+
     uint32_t delta = 0x9e3779b9;
-    uint32_t v0 = values[0], v1 = values[1], 
+    uint32_t v0 = values[0], v1 = values[1],
     		sum = delta<<5, i;
 
     for (i = 0; i < 32; i++) {
@@ -44,7 +44,7 @@ void decrypt(uint32_t* values, uint32_t* key) {
         v0 -= ((v1 << 4) + key[0]) ^ (v1 + sum) ^ ((v1 >> 5) + key[1]);
         sum -= delta;
     }
-    
+
     values[0] = v0; values[1] = v1;
 
 }
@@ -59,7 +59,8 @@ void decrypt(uint32_t* values, uint32_t* key) {
  */
 void combine(unsigned char* str, uint32_t* values){
     // TODO: write this function.
-
+	values[0] = str[0] | str[1] << 8 | str[2] << 16 | str[3] << 24;
+    values[1] = str[4] | str[5] << 8 | str[6] << 16 | str[7] << 24;
 }
 
 

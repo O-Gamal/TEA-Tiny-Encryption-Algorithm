@@ -1,7 +1,10 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-
+uint32_t inputLen;
+uint32_t newSize;
+uint32_t rounds;
+bool decision;
 
 /**
  * This function uses a 128-bit key to encrypt a 64-bit block in 32 cycles using TEA
@@ -34,9 +37,9 @@ void encrypt(uint32_t* values, uint32_t* key) {
  */
 void decrypt(uint32_t* values, uint32_t* key) {
     // TODO: write this function.
-    
+
     uint32_t delta = 0x9e3779b9;
-    uint32_t v0 = values[0], v1 = values[1], 
+    uint32_t v0 = values[0], v1 = values[1],
     		sum = delta<<5, i;
 
     for (i = 0; i < 32; i++) {
@@ -44,7 +47,7 @@ void decrypt(uint32_t* values, uint32_t* key) {
         v0 -= ((v1 << 4) + key[0]) ^ (v1 + sum) ^ ((v1 >> 5) + key[1]);
         sum -= delta;
     }
-    
+
     values[0] = v0; values[1] = v1;
 
 }
@@ -98,63 +101,115 @@ string split(uint32_t* values){
 /**
  * This function works as a driver for all other functions to prevent duplicated code
  *
- * Convert user input (string contains 8 chars) to char array and pass it to combine function
- * Encrypt the 8 characters (64-bit block) using the 4 digits keys (128-bit block)
- * Display the encrypted message
+ * It also Splits the string into multiple blocks of 64-bits to allow input of any size
+ * Encrypt or Decrypt every block (depending on decision bit)
+ * Display the encrypted text or the decrypted text
  *
- * Decrypt the 8 characters (64-bit block) again using the 4 digits keys (128-bit block)
- * Display the decrypted message
  *
  * @param str - The user input
  * @param key - uint32_t array of size 4 (128-bit key)
  */
-void TEA(string str, uint32_t* key)
-{
-    uint32_t values[2];
-    unsigned char message[9] = "";
+string TEA(string in, uint32_t* key){
 
-    for(int i = 0 ; i < 2 ; i++)
+    string out = "";
+    uint32_t values[2];
+    unsigned char turn[9]= "";
+
+    for(uint32_t i = 0 ; i < rounds ; i++)
     {
-        //converting user input to char array
-        for (int i = 0; i < 8; i++) {
-            message[i] = str[i];
+        for(int j = 0 ; j < 8 ; j++)
+        {
+            turn[j] = in[i*8 + j];
         }
 
-        combine(message, values);
-        i == 0 ? encrypt(values, key) : decrypt(values, key);
-        str = split(values);
+        combine(turn, values);
 
-        i == 0 ? cout<<"Encrypted: " : cout<<"Decrypted: ";
-        cout<<str<<endl;
+        if(decision == 0)
+            encrypt(values, key);
+        else
+            decrypt(values, key);
+
+        out+=split(values);
     }
+
+    cout<<endl;
+    if(decision == 0)
+    {
+        cout<<"Encrypted: ";
+    }
+    else
+        cout<<"Decrypted: ";
+
+    for(uint32_t i = 0 ; i < inputLen ; i++)
+    {
+        cout<<out[i];
+    }
+    cout<<endl<<endl;
+
+    return out;
 }
 
 
 
 /**
- * Read 8 characters from the user
- * Read 4 digits key from the user
+ * Read a string of any size from the user
+ * Read 4 integer keys from the user
  *
- * Encrypt the 8 characters (64-bit block) using the 4 digits keys (128-bit block)
+ * Encrypt the whole string using the 4 integer keys
  * Display the encrypted message
  *
- * Decrypt the 8 characters (64-bit block) using the 4 digits keys (128-bit block)
+ * Ask the user if he wants to decrypt or enter another string?
+ *
  * Display the decrypted message
+ * or go to the begining of the program again
  */
-int main(){
-    // TODO: write this function.
-	string input= "";
-	uint32_t key[4] = {0,0,0,0};
-
-	cout<<"Enter 8 characters: ";
-	getline(cin,input);
-
-	cout<<"Enter a 4 digits key: ";
-    for(int i = 0 ; i < 4 ; i++)
+int main()
+{
+    while(1)
     {
-        cin>>key[i];
-    }
-    TEA(input, key);
+        string input="";
+        decision = 0;
+        string encrypted="";
+        string decrypted="";
+        uint32_t key[4] = {0,0,0,0};
+        cin.sync();
 
-	return 0;
+        cout<<"Enter a String: ";
+        getline(cin,input);
+
+        inputLen = input.length();
+
+        newSize = inputLen;
+
+        cout<<"Enter a 4 digits key: ";
+        for(int i = 0 ; i < 4 ; i++)
+        {
+            cin>>key[i];
+        }
+
+        if (inputLen % 8 != 0)
+            newSize = inputLen + (8 - inputLen % 8);
+
+        for (uint32_t i = 0; i < newSize - inputLen; ++i)
+        {
+            char c = 0x0;
+            input += c;
+        }
+
+        //rounds = how many blocks have been entered by user
+        rounds = newSize/8;
+
+        decision = 0;
+        encrypted = TEA(input, key);
+
+        cout<<"Enter (1) to Decrypt, or (0) to Enter another sentence: ";
+        cin>>decision;
+
+        if(decision)
+        {
+            decision = 1;
+            decrypted = TEA(encrypted, key);
+            return 0;
+        }
+    }
 }

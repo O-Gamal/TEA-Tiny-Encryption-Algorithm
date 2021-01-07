@@ -7,6 +7,12 @@ INCLUDE Irvine32.inc
 turn db 8 DUP(0),0 ; char array of size 8
 ;----- end combine data -----
 
+
+;----- split data -----
+splitOut db 8 DUP(0), 0
+;----- end split data -----
+
+
 ;----- encrypt & decrypt data -----
 sum dd 0
 values dd 2 DUP(0)
@@ -16,9 +22,21 @@ delta dd 9e3779b9h ;constant
 key dd 4 DUP(0)
 ;----- end encrypt & decrypt data -----
 
-;----- split data -----
-splitOut db 8 DUP(0), 0
-;----- end split data -----
+
+;----- TEA data -----
+inputLen dd ?
+rounds dd 0
+teaIn db 1000 DUP(0),0 ;string of size multiples of 8
+i dw 0
+j db 0
+teaOut db 1000 DUP(0),0 
+decision db 0
+encryptedMsg db "Encrypted: ", 0
+decryptedMsg db "Decrypted: ", 0
+printIndex dd 0
+;----- end TEA data -----
+
+
 
 .code	;Inser ur code here
 
@@ -48,15 +66,153 @@ main ENDP
 ;
 ;----------------   Start TEA   ----------------
 TEA PROC
-    ;TODO: write this proc.
-	
+    
+    ;calc no of rounds
+    call calcRounds
+    
+    mov i ,0
+    cmp rounds , 0
+    ;jump if below or equal 
+    jbe skipTeaOuterLoop
+
+    ;for(int i = 0 ; i < rounds ; i++)
+    teaOuterLoop:
+        
+        mov j,0
+        ;for(int j = 0 ; j < 8 ; j++)
+        mov ecx, 8  ; ecx = 8
+        turnLoop:
+
+        ;turn[j] = teaIn[i*8 + j];
+        mov eax, 0
+        mov eax, 8 
+        mul i   ;eax = 8 * i
+        movzx edx, j
+        add eax , edx     ;eax= (8*i + j)
+
+        lea edx, teaIn  ;edx = offset teaIn
+        mov eax,[edx + eax]     ;eax = teaIn[i*8 + j]
+      
+        movzx ebx , j ; ebx = j
+        add ebx, offset turn ; ebx = turn[j]
+
+        mov [ebx] , al    ;turn[j] = teaIn[i*8 + j]
+
+        INC j
+
+        LOOP turnLoop
+		
+		;combine(turn, values);
+        call combine
+
+        ;if(decision == 0) encrypt(values, key);
+        ;else decrypt(values, key);
+        CMP decision, 0
+        je encryption
+        call decrypt
+        jmp endDecision
+
+        encryption:
+            call encrypt
+
+        endDecision:
+
+        ;teaOut+=split(values); 
+        call split ;return splitOut contains 8 chars
+        
+
+        ;teaOut += splitOut
+        mov esi, offset splitOut
+        mov edi, offset teaOut
+        mov eax, 8 
+        mul i   ;eax = 8 * i
+        add edi, eax
+        mov ecx, 8
+        cld
+        REP MOVSB
+        
+        INC i
+        dec rounds
+
+        cmp rounds, 0
+    Jg teaOuterLoop
+
+    skipTeaOuterLoop:
+
+     call crlf
+
+    ;if(decision == 0) cout<<"Encrypted: ";
+    ;else cout<<"Decrypted: ";    
+    CMP decision, 0
+    je printEncrypted
+        lea edx, decryptedMsg
+        call writestring
+    jmp endPrintDecision
+
+    printEncrypted:
+        lea edx, encryptedMsg
+        call writestring
+
+    endPrintDecision:
+
+
+    ;for(int i = 0 ; i < inputLen ; i++) cout<<out[i];
+    
+    mov printIndex , 0
+    mov ecx, inputLen
+
+    printLoop:
+        lea ebx, teaOut
+        add ebx , printIndex
+        mov al, [ebx]
+        call writechar
+
+        inc printIndex
+    LOOP printLoop
+
+    call crlf
+    call crlf
+    
+    
     ret
 TEA ENDP
 ;----------------    End TEA    ----------------
 
 
+;-----------------------------------------------
+;
+; This is helper proc called in TEA proc to calculate number of rounds
+; rounds is the number we split string to
+;
+; Recieves: double word inputLen 
+; 
+; Returns: double word rounds
+;
+;---------------- Start calcRounds ----------------
 
+calcRounds PROC
 
+    ;calculating rounds
+    ;rounds = inputLen/8;
+    mov edx , 0
+    mov eax, inputLen
+    mov ecx, 8
+
+    div ecx ;eax = quotient , edx = remainder
+
+    mov rounds ,eax ;round = quotient
+
+    ;if(inputLen%8 != 0)
+    ; rounds++;
+    CMP edx , 0 ; if remainder == 0 dont inc 
+    jz noInc
+    INC rounds ;else inc
+
+    noInc:
+
+    ret
+    
+calcRounds ENDP
 
 ;-----------------------------------------------
 ;

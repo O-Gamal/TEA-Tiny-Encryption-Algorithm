@@ -37,6 +37,17 @@ printIndex dd 0
 ;----- end TEA data -----
 
 
+;----- main data -----
+inputMsg db "Enter a string: ",0
+inKeyMsg db "**Enter 4 keys**",10,13,0
+enterKeyMsg db "Enter Key ",0
+colon db ": ",0
+msgBoxDecrypt db "Would you like to decrypt?",0
+msgBoxRestart db "Would you like to enter another string?",0
+msgBoxDecTitle db "Decrypt ?",0
+msgBoxResTitle db "Restart ?",0
+;----- end main data -----
+
 
 .code	;Inser ur code here
 
@@ -44,9 +55,94 @@ printIndex dd 0
 
 ;----------------   Start Main  ----------------
 main PROC
-    ;TODO: write this proc.
 	
-    INVOKE ExitProcess, 0	;end the program
+    START:
+        ;cout<<"Enter a String: "
+        lea edx, inputMsg 
+        call writestring
+
+        ;getline(cin,input)
+        lea edx, teaIn 
+        mov ecx, 1000
+        call readstring
+
+        call StrLength ; eax = teaIn.length()
+        mov inputLen, eax ;inputLen = teaIn.length()
+
+        ;handling empty input
+        cmp inputLen,0
+        je START
+
+        ;remove newline char from the string buffer
+        add eax , offset teaIn
+        mov BYTE PTR [eax+1], 0 ;[teaIn + inputLen + 1] = 00h
+
+        ;cout<<"Enter a 4 keys: "
+        lea edx, inKeyMsg
+        call writestring
+
+        ;for(int i = 0 ; i < 4 ; i++) cin>>key[i];
+        mov ecx, 4
+        lea ebx, key
+        mov i, 1
+        keyLoop:
+
+            ;cout<<"enter key no#:";
+            lea edx, enterKeyMsg
+            call writestring
+
+            ;cout<<"#: ";
+            movzx eax,i
+            call writeDec
+            lea edx, colon
+            call writestring
+
+            ;cin>>key[i];
+            call readDec
+            mov [ebx], eax
+            add ebx, 4
+            inc i
+
+        LOOP keyLoop
+
+        mov decision, 0 ;decision = 0 to set TEA to encrypt
+        ;teaOut = TEA(teaIn, key) >> encryption
+        call TEA
+    
+        ;make a msgbox asking would u like to decrypt?
+        lea  edx, msgBoxDecrypt
+        lea  ebx, msgBoxDecTitle
+        call MsgBoxAsk
+
+        ;if yes call decrypt
+        ;else 
+        ;make a msg box asking would u like to enter another message?
+        ;if yes goto the start of main
+        ;else goto end main
+        cmp eax , IDYES ;eax = 7 if user choose no, eax = 6 if yes /// IDYES = 6
+        ja skipDecryption
+
+        mov decision, 1 ;decision = 1 to set TEA to encrypt
+
+        ; teaIn = teaOut //copy teaOut in teaIn
+        lea eax, teaOut
+        lea ebx, teaIn
+        INVOKE Str_copy,eax, ebx
+
+        ;teaOut = TEA(teaIn, key) >> decryption
+        call TEA
+
+        skipDecryption:
+        lea edx, msgBoxRestart
+        lea ebx, msgBoxResTitle
+        call MsgBoxAsk
+        ;if clicked yes goto start
+        cmp eax , IDYES
+
+    je START
+
+	INVOKE ExitProcess, 0	;end the program
+
 main ENDP
 ;----------------    End Main   ----------------
 

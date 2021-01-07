@@ -3,6 +3,9 @@ INCLUDE Irvine32.inc
 
 .data	;Insert ur data here
 
+;----- combine data -----
+turn db 8 DUP(0),0 ; char array of size 8
+;----- end combine data -----
 
 ;----- encrypt & decrypt data -----
 sum dd 0
@@ -270,9 +273,53 @@ decrypt ENDP
 ;
 ;---------------- Start combine ----------------
 combine PROC
-    ;TODO: write this proc.
-	
+
+    ;v[0] = s[0] | s[1] << 8 | s[2] << 16 | s[3] << 24;
+	movzx edx, [turn+0]
+
+	mov eax, 0
+	mov al, [turn+1]
+	shl eax, 8
+
+	or edx, eax
+
+	mov eax, 0
+	mov al, [turn+2]
+	shl eax, 16
+
+	or edx, eax
+
+	mov eax, 0
+	mov al, [turn+3]
+	shl eax, 24
+
+	or edx, eax
+	mov [values+0], edx
+
+	;v[1] = s[4] | s[5] << 8 | s[6] << 16 | s[7] << 24;
+	movzx edx, [turn+4]
+
+	mov eax, 0
+	mov al, [turn+5]
+	shl eax, 8
+
+	or edx, eax
+
+	mov eax, 0
+	mov al, [turn+6]
+	shl eax, 16
+
+	or edx, eax
+
+	mov eax, 0
+	mov al, [turn+7]
+	shl eax, 24
+
+	or edx, eax
+	mov [values+4], edx
+
     ret
+	
 combine ENDP
 ;----------------  End combine  ----------------
 

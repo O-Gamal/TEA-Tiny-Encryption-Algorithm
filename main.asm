@@ -3,6 +3,9 @@ INCLUDE Irvine32.inc
 
 .data	;Insert ur data here
 
+;----- combine data -----
+turn db 8 DUP(0),0 ; char array of size 8
+;----- end combine data -----
 
 ;----- encrypt & decrypt data -----
 sum dd 0

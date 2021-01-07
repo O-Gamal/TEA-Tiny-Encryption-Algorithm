@@ -23,6 +23,11 @@ rounds dd 0
 teaIn db 1000 DUP(0),0 ;string of size multiples of 8
 i dw 0
 j db 0
+teaOut db 1000 DUP(0),0 
+decision db 0
+encryptedMsg db "Encrypted: ", 0
+decryptedMsg db "Decrypted: ", 0
+printIndex dd 0
 
 ;----- end TEA data -----
 
@@ -93,6 +98,32 @@ TEA PROC
 		
 		;combine(turn, values);
         call combine
+
+        ;if(decision == 0) encrypt(values, key);
+        ;else decrypt(values, key);
+        CMP decision, 0
+        je encryption
+        call decrypt
+        jmp endDecision
+
+        encryption:
+            call encrypt
+
+        endDecision:
+
+        ;teaOut+=split(values); 
+        call split ;return splitOut contains 8 chars
+        
+
+        ;teaOut += splitOut
+        mov esi, offset splitOut
+        mov edi, offset teaOut
+        mov eax, 8 
+        mul i   ;eax = 8 * i
+        add edi, eax
+        mov ecx, 8
+        cld
+        REP MOVSB
         
         INC i
         dec rounds

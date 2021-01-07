@@ -132,6 +132,40 @@ TEA PROC
     Jg teaOuterLoop
 
     skipTeaOuterLoop:
+
+     call crlf
+
+    ;if(decision == 0) cout<<"Encrypted: ";
+    ;else cout<<"Decrypted: ";    
+    CMP decision, 0
+    je printEncrypted
+        lea edx, decryptedMsg
+        call writestring
+    jmp endPrintDecision
+
+    printEncrypted:
+        lea edx, encryptedMsg
+        call writestring
+
+    endPrintDecision:
+
+
+    ;for(int i = 0 ; i < inputLen ; i++) cout<<out[i];
+    
+    mov printIndex , 0
+    mov ecx, inputLen
+
+    printLoop:
+        lea ebx, teaOut
+        add ebx , printIndex
+        mov al, [ebx]
+        call writechar
+
+        inc printIndex
+    LOOP printLoop
+
+    call crlf
+    call crlf
     
     
     ret

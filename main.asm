@@ -16,6 +16,10 @@ delta dd 9e3779b9h ;constant
 key dd 4 DUP(0)
 ;----- end encrypt & decrypt data -----
 
+;----- split data -----
+splitOut db 8 DUP(0), 0
+;----- end split data -----
+
 .code	;Inser ur code here
 
 
@@ -339,9 +343,37 @@ combine ENDP
 ;
 ;----------------- Start split -----------------
 split PROC
-    ;TODO: write this proc.
-	
+
+    ;splitting first 4 chars
+
+    mov eax, [values] 
+    mov [splitOut], al ; splitOut[0] = first char in values[0]
+
+    shr eax, 8
+    mov [splitOut+1], al ; splitOut[1] = second char in values[0]
+
+    shr eax, 8
+    mov [splitOut+2], al ; splitOut[2] = third char in values[0]
+
+    shr eax, 8
+    mov [splitOut+3], al ; splitOut[3] = fourth char in values[0]
+
+
+    ;splitting second 4 chars
+    mov eax, [values+4]
+    mov [splitOut+4], al ; splitOut[4] = first char in values[1]
+
+    shr eax, 8
+    mov [splitOut+5], al ; splitOut[5] = second char in values[1]
+
+    shr eax, 8
+    mov [splitOut+6], al ; splitOut[6] = third char in values[1]
+
+    shr eax, 8
+    mov [splitOut+7], al ; splitOut[7] = fourth char in values[1]
+
     ret
+
 split ENDP
 ;-----------------  End split  -----------------
 

@@ -20,6 +20,9 @@ key dd 4 DUP(0)
 
 inputLen dd ?
 rounds dd 0
+teaIn db 1000 DUP(0),0 ;string of size multiples of 8
+i dw 0
+j db 0
 
 ;----- end TEA data -----
 
@@ -53,8 +56,53 @@ main ENDP
 ;----------------   Start TEA   ----------------
 TEA PROC
     
+    ;calc no of rounds
     call calcRounds
-	
+    
+    mov i ,0
+    cmp rounds , 0
+    ;jump if below or equal 
+    jbe skipTeaOuterLoop
+
+    ;for(int i = 0 ; i < rounds ; i++)
+    teaOuterLoop:
+        
+        mov j,0
+        ;for(int j = 0 ; j < 8 ; j++)
+        mov ecx, 8  ; ecx = 8
+        turnLoop:
+
+        ;turn[j] = teaIn[i*8 + j];
+        mov eax, 0
+        mov eax, 8 
+        mul i   ;eax = 8 * i
+        movzx edx, j
+        add eax , edx     ;eax= (8*i + j)
+
+        lea edx, teaIn  ;edx = offset teaIn
+        mov eax,[edx + eax]     ;eax = teaIn[i*8 + j]
+      
+        movzx ebx , j ; ebx = j
+        add ebx, offset turn ; ebx = turn[j]
+
+        mov [ebx] , al    ;turn[j] = teaIn[i*8 + j]
+
+        INC j
+
+        LOOP turnLoop
+		
+		;combine(turn, values);
+        call combine
+        
+        INC i
+        dec rounds
+
+        cmp rounds, 0
+    Jg teaOuterLoop
+
+    skipTeaOuterLoop:
+    
+    
     ret
 TEA ENDP
 ;----------------    End TEA    ----------------
@@ -63,9 +111,11 @@ TEA ENDP
 ;-----------------------------------------------
 ;
 ; This is helper proc called in TEA proc to calculate number of rounds
-; rounds is the number we split string  
+; rounds is the number we split string to
 ;
-; Recieves: inputLen dd ?
+; Recieves: double word inputLen 
+; 
+; Returns: double word rounds
 ;
 ;---------------- Start calcRounds ----------------
 

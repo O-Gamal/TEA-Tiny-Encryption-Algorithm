@@ -165,8 +165,93 @@ encrypt ENDP
 ;
 ;---------------- Start decrypt ----------------
 decrypt PROC
-    ;TODO: write this proc.
-	
+    ;v0 = values[0]
+    mov eax, [values]
+    mov v0, eax
+
+    ;v1 = values[1]
+    mov eax, [values+4]
+    mov v1, eax
+
+    ;sum = delta<<5
+    mov ebx, delta
+    shl ebx, 5
+    mov sum, ebx
+
+    ;for (i = 0; i < 32; i++)
+    ;loop 32 times
+    mov ecx, 32
+
+    encLoop:
+
+        ;v1 -= ((v0 << 4) + key[2]) ^ (v0 + sum) ^ ((v0 >> 5) + key[3]);
+
+        ;v0<<4
+        mov eax, v0
+        shl eax, 4
+        ;(v0 << 4) + key[2])
+        add eax, [key+8] ; eax =(v0 << 4) + key[2])
+    
+        ;(v0 + sum)
+        mov ebx, v0
+        add ebx, sum ; ebx = (v0 + sum)
+
+        ;(v0 << 4) + key[2]) ^ (v0 + sum)  >>> eax ^ ebx
+        xor eax, ebx ; eax = (v0 << 4) + key[2]) ^ (v0 + sum)
+
+        ;((v0 >> 5) + key[3])
+        mov ebx, v0
+        shr ebx, 5  ;ebx = (v0 >> 5)
+        add ebx, [key+12]    ;ebx =(v0 >> 5) + key[3]
+
+        ;eax = (v0 << 4) + key[2]) ^ (v0 + sum)  
+        ;ebx = (v0 >> 5) + key[3]
+        xor eax, ebx  ; eax = ((v0 << 4) + key[2]) ^ (v0 + sum) ^ ((v0 >> 5) + key[3])
+
+        sub v1, eax ;v1 -= ((v0 << 4) + key[2]) ^ (v0 + sum) ^ ((v0 >> 5) + key[3])
+
+
+        ;v0 -= ((v1 << 4) + key[0]) ^ (v1 + sum) ^ ((v1 >> 5) + key[1]);
+
+        ;v1<<4
+        mov eax, v1
+        shl eax, 4
+        ;(v1 << 4) + key[0])
+        add eax, [key] ; eax =(v1 << 4) + key[0])
+    
+        ;(v1 + sum)
+        mov ebx, v1
+        add ebx, sum ; ebx = (v1 + sum)
+
+        ;(v1 << 4) + key[0]) ^ (v1 + sum)  >>> eax ^ ebx
+        xor eax, ebx ; eax = (v1 << 4) + key[0]) ^ (v1 + sum)
+
+        ;((v1 >> 5) + key[1])
+        mov ebx, v1
+        shr ebx, 5  ;ebx = (v1 >> 5)
+        add ebx, [key+4]    ;ebx =(v1 >> 5) + key[1]
+
+        ;eax = (v1 << 4) + key[0]) ^ (v1 + sum)  
+        ;ebx = (v1 >> 5) + key[1]
+        xor eax, ebx  ; eax = ((v1 << 4) + key[0]) ^ (v1 + sum) ^ ((v1 >> 5) + key[1])
+
+        sub v0, eax ;v0 -= ((v1 << 4) + key[0]) ^ (v1 + sum) ^ ((v1 >> 5) + key[1])
+
+
+        ;sum -= delta;
+        mov eax, delta
+        sub sum ,eax
+
+    loop encLoop
+
+    ;values[0] = v0
+    mov eax, v0
+    mov [values] , eax
+
+    ;values[1] = v1
+    mov eax, v1
+    mov [values+4] , eax
+
     ret
 decrypt ENDP
 ;----------------  End decrypt  ----------------

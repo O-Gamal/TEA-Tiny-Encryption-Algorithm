@@ -16,6 +16,14 @@ delta dd 9e3779b9h ;constant
 key dd 4 DUP(0)
 ;----- end encrypt & decrypt data -----
 
+;----- TEA data -----
+
+inputLen dd ?
+rounds dd 0
+
+;----- end TEA data -----
+
+
 .code	;Inser ur code here
 
 
@@ -44,15 +52,46 @@ main ENDP
 ;
 ;----------------   Start TEA   ----------------
 TEA PROC
-    ;TODO: write this proc.
+    
+    call calcRounds
 	
     ret
 TEA ENDP
 ;----------------    End TEA    ----------------
 
 
+;-----------------------------------------------
+;
+; This is helper proc called in TEA proc to calculate number of rounds
+; rounds is the number we split string  
+;
+; Recieves: inputLen dd ?
+;
+;---------------- Start calcRounds ----------------
 
+calcRounds PROC
 
+    ;calculating rounds
+    ;rounds = inputLen/8;
+    mov edx , 0
+    mov eax, inputLen
+    mov ecx, 8
+
+    div ecx ;eax = quotient , edx = remainder
+
+    mov rounds ,eax ;round = quotient
+
+    ;if(inputLen%8 != 0)
+    ; rounds++;
+    CMP edx , 0 ; if remainder == 0 dont inc 
+    jz noInc
+    INC rounds ;else inc
+
+    noInc:
+
+    ret
+    
+calcRounds ENDP
 
 ;-----------------------------------------------
 ;

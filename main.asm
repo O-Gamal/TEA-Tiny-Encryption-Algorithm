@@ -24,6 +24,7 @@ key dd 4 DUP(0)
 
 
 ;----- TEA data -----
+printString db 5000 DUP(0),0
 inputLen dd ?
 rounds dd 0
 teaIn db 1000 DUP(0),0 ;string of size multiples of 8
@@ -242,6 +243,22 @@ TEA PROC
 
     skipTeaOuterLoop:
 
+    ;copy exactly input length char from teaOut to printString
+    mov ecx, inputLen
+    lea ebx, teaOut
+    lea edx, printString
+
+    copyTeaOut:
+        
+        mov al, [ebx]
+        mov [edx], al
+
+        inc ebx
+        inc edx
+
+    LOOP copyTeaOut
+    mov BYTE PTR [edx], 0
+    
   ;if(decision == 0) cout<<"Encrypted: ";
     ;else cout<<"Decrypted: ";    
 
@@ -255,7 +272,7 @@ TEA PROC
 
     endPrintDecision:
 
-    lea edx, teaOut
+    lea edx, printString
     call msgBox
 
     ret

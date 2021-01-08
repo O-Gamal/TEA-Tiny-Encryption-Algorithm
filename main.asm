@@ -46,6 +46,7 @@ msgBoxDecrypt db "Would you like to decrypt?",0
 msgBoxRestart db "Would you like to enter another string?",0
 msgBoxDecTitle db "Decrypt ?",0
 msgBoxResTitle db "Restart ?",0
+newSize dd ?
 ;----- end main data -----
 
 
@@ -125,9 +126,15 @@ main PROC
         mov decision, 1 ;decision = 1 to set TEA to encrypt
 
         ; teaIn = teaOut //copy teaOut in teaIn
-        lea eax, teaOut
-        lea ebx, teaIn
-        INVOKE Str_copy,eax, ebx
+        mov ecx, newSize
+        lea ebx, teaOut
+        lea edx, teaIn
+        copyLoop:
+        mov al, [ebx]
+        mov [edx], al
+        inc edx
+        inc ebx
+        LOOP copyLoop
 
         ;teaOut = TEA(teaIn, key) >> decryption
         call TEA
@@ -305,7 +312,11 @@ calcRounds PROC
     INC rounds ;else inc
 
     noInc:
-
+     ; calculate new string size
+        mov eax, 8
+        mul rounds ;eax = round*8
+        mov newSize, eax
+        
     ret
     
 calcRounds ENDP

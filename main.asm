@@ -31,8 +31,8 @@ i dw 0
 j db 0
 teaOut db 1000 DUP(0),0 
 decision db 0
-encryptedMsg db "Encrypted: ", 0
-decryptedMsg db "Decrypted: ", 0
+encryptedMsg db "Encrypted text", 0
+decryptedMsg db "Decrypted text", 0
 printIndex dd 0
 ;----- end TEA data -----
 
@@ -242,41 +242,22 @@ TEA PROC
 
     skipTeaOuterLoop:
 
-     call crlf
-
-    ;if(decision == 0) cout<<"Encrypted: ";
+  ;if(decision == 0) cout<<"Encrypted: ";
     ;else cout<<"Decrypted: ";    
+
     CMP decision, 0
     je printEncrypted
-        lea edx, decryptedMsg
-        call writestring
+        lea ebx, decryptedMsg
     jmp endPrintDecision
 
     printEncrypted:
-        lea edx, encryptedMsg
-        call writestring
+        lea ebx, encryptedMsg
 
     endPrintDecision:
 
+    lea edx, teaOut
+    call msgBox
 
-    ;for(int i = 0 ; i < inputLen ; i++) cout<<out[i];
-    
-    mov printIndex , 0
-    mov ecx, inputLen
-
-    printLoop:
-        lea ebx, teaOut
-        add ebx , printIndex
-        mov al, [ebx]
-        call writechar
-
-        inc printIndex
-    LOOP printLoop
-
-    call crlf
-    call crlf
-    
-    
     ret
 TEA ENDP
 ;----------------    End TEA    ----------------

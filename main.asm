@@ -248,17 +248,23 @@ TEA PROC
     lea ebx, teaOut
     lea edx, printString
 
-    copyTeaOut:
+      copyTeaOut:
         
         mov al, [ebx]
-        mov [edx], al
+        ;if (char == '\0') replace with ' '
+        cmp al, 0
+        jne putChar
+        mov al, ' '
+
+        putChar:
+            mov [edx], al
 
         inc ebx
         inc edx
 
     LOOP copyTeaOut
-    mov BYTE PTR [edx], 0
-    
+        mov BYTE PTR [edx], 0
+ 
   ;if(decision == 0) cout<<"Encrypted: ";
     ;else cout<<"Decrypted: ";    
 

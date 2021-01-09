@@ -263,8 +263,16 @@ TEA PROC
         inc edx
 
     LOOP copyTeaOut
-        mov BYTE PTR [edx], 0
+    mov BYTE PTR [edx], 0
  
+    ;erase everything in teaIn (user input)
+    mov ecx , newSize
+    lea ebx, teaIn
+    eraseTeaIn:
+    	mov BYTE PTR [ebx], 0
+	inc ebx
+    LOOP eraseTeaIn
+
   ;if(decision == 0) cout<<"Encrypted: ";
     ;else cout<<"Decrypted: ";    
 

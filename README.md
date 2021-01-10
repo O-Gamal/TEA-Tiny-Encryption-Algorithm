@@ -32,3 +32,16 @@ In our project transmitted data, be encrypted and decrypted using One of most ef
 
 ### Encryption algorithm 
 ![Encryption](https://user-images.githubusercontent.com/47731377/104136762-cc285480-53a0-11eb-9609-f595af29ff94.png)
+
+### Split
+* This function the reverse operation of combine.
+
+* It uses the returned array from encryption or decryption,
+every 32-bit integer splied into 4
+chars.
+
+![Split](https://user-images.githubusercontent.com/47731377/104136771-e2361500-53a0-11eb-9d02-daec71d0d59f.png)
+### Decryption algorithm 
+![Decryption](https://user-images.githubusercontent.com/47731377/104136776-ed894080-53a0-11eb-870a-329aab1efbe7.png)
+
+

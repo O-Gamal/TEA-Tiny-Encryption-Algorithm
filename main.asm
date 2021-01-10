@@ -24,13 +24,14 @@ key dd 4 DUP(0)
 
 
 ;----- TEA data -----
-printString db 5000 DUP(0),0
+maxInput = 5000
+printString db maxInput DUP(0),0
 inputLen dd ?
 rounds dd 0
-teaIn db 1000 DUP(0),0 ;string of size multiples of 8
+teaIn db maxInput DUP(0),0 ;string of size multiples of 8
 i dw 0
 j db 0
-teaOut db 1000 DUP(0),0 
+teaOut db maxInput DUP(0),0 
 decision db 0
 encryptedMsg db "Encrypted text", 0
 decryptedMsg db "Decrypted text", 0
@@ -51,6 +52,12 @@ newSize dd ?
 ;----- end main data -----
 
 
+;----- handleKey data -----
+keyStr db 200 DUP(0)
+validKey dd ?
+invalidInputMsg db "Invalid Input, Try another key: ",0
+;----- end handleKey data -----
+
 .code	;Inser ur code here
 
 
@@ -65,7 +72,7 @@ main PROC
 
         ;getline(cin,input)
         lea edx, teaIn 
-        mov ecx, 1000
+        mov ecx, maxInput
         call readstring
 
         call StrLength ; eax = teaIn.length()
@@ -100,7 +107,8 @@ main PROC
             call writestring
 
             ;cin>>key[i];
-            call readDec
+			call handleKey
+            mov eax , validKey
             mov [ebx], eax
             add ebx, 4
             inc i
@@ -145,9 +153,9 @@ main PROC
         lea ebx, msgBoxResTitle
         call MsgBoxAsk
         ;if clicked yes goto start
+		call crlf
         cmp eax , IDYES
-
-    je START
+		je START
 
 	INVOKE ExitProcess, 0	;end the program
 
@@ -155,6 +163,64 @@ main ENDP
 ;----------------    End Main   ----------------
 
 
+
+;-----------------------------------------------
+;
+; This proc handle exceptions for key
+; 
+; It reads a string from the user and check if it contains a valid or invalid key
+; 
+; Returns: a DWORD contains the valid key the user input
+;----------------   Start handleKey   ----------------
+handleKey PROC USES ecx
+
+    keyLoop:
+		;Enter a key (string)
+		lea edx, keyStr
+		mov ecx, 200
+		call readstring
+	
+		;loop on the string char by char
+		call strlength
+		mov ecx, eax
+		checkKey:
+			mov al, [edx]
+			;if char ==' ' skip isDigit (ignore spaces)
+			cmp al, ' '
+			je skipIsDigit
+
+			;else check if the char is a digit or not
+			call isdigit ;isdigit sets ZF=0 if char is invalid
+			jnz invalidKey
+
+			;repeat for next char
+			skipIsDigit:
+			inc edx
+		LOOP checkKey
+
+		;at the end of the loop the string contains spaces and digits only
+		;but we have to check if the digits is not greater than (2^32)-1
+
+		;(valid input) parse the valid key from the string 
+		lea edx, keyStr
+		call strlength
+		mov ecx, eax
+		call parseDecimal32
+		;if CF == 1 then the entered key is blank or greater than (2^32)-1
+		jc invalidKey
+		;else //CF == 0 The entered key is valid
+		mov validKey, eax
+		jmp endProc
+
+		invalidKey:
+			lea edx ,invalidInputMsg
+			call writestring
+			jmp keyLoop
+
+		endProc:
+    ret
+handleKey ENDP
+;----------------    End handleKey   ----------------
 
 
 
@@ -619,33 +685,39 @@ combine ENDP
 ;----------------- Start split -----------------
 split PROC
 
+    ;splitOut[0] = first char in values[0] ;splitOut[1] = second char in values[0]
+    ;splitOut[2] = third char in values[0] ;splitOut[3] = fourth char in values[0]
+    ;-----------------------------------------------------------------------------
+    ;splitOut[4] = first char in values[1] ;splitOut[5] = second char in values[1]
+    ;splitOut[6] = third char in values[1] ;splitOut[7] = fourth char in values[1]
+
     ;splitting first 4 chars
+    mov eax, values[0]
 
-    mov eax, [values] 
-    mov [splitOut], al ; splitOut[0] = first char in values[0]
+    lea ebx, splitOut ; ebx = offset splitOut
+    mov ecx, 2 ;counter of outerloop
+    splitOuterLoop:
+        
+        mov edx, ecx ;storing the counter of outerloop in edx
 
-    shr eax, 8
-    mov [splitOut+1], al ; splitOut[1] = second char in values[0]
+        mov ecx, 2 ;setting counter of inner loop
+        splitInnerLoop:
 
-    shr eax, 8
-    mov [splitOut+2], al ; splitOut[2] = third char in values[0]
+                mov [ebx], al
+                inc ebx
 
-    shr eax, 8
-    mov [splitOut+3], al ; splitOut[3] = fourth char in values[0]
+                mov [ebx], ah
+                inc ebx
 
+                shr eax, 16
 
-    ;splitting second 4 chars
-    mov eax, [values+4]
-    mov [splitOut+4], al ; splitOut[4] = first char in values[1]
+        LOOP splitInnerLoop
 
-    shr eax, 8
-    mov [splitOut+5], al ; splitOut[5] = second char in values[1]
+        ;splitting second 4 chars
+        mov eax, values[4]
 
-    shr eax, 8
-    mov [splitOut+6], al ; splitOut[6] = third char in values[1]
-
-    shr eax, 8
-    mov [splitOut+7], al ; splitOut[7] = fourth char in values[1]
+        mov ecx, edx ;putting the counter of outer loop back in ecx
+  LOOP splitOuterLoop
 
     ret
 

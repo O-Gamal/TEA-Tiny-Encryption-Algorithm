@@ -51,6 +51,10 @@ newSize dd ?
 ;----- end main data -----
 
 
+;----- handleKey data -----
+keyStr db 200 DUP(0)
+;----- end handleKey data -----
+
 .code	;Inser ur code here
 
 
@@ -155,6 +159,38 @@ main ENDP
 ;----------------    End Main   ----------------
 
 
+
+
+;----------------   Start handleKey   ----------------
+handleKey PROC USES ecx
+
+    keyLoop:
+		;Enter a key (string)
+		lea edx, keyStr
+		mov ecx, 200
+		call readstring
+	
+		;loop on the string char by char
+		call strlength
+		mov ecx, eax
+		checkKey:
+			mov al, [edx]
+			;if char ==' ' skip isDigit (ignore spaces)
+			cmp al, ' '
+			je skipIsDigit
+
+			;else check if the char is a digit or not
+			call isdigit ;isdigit sets ZF=0 if char is invalid
+			;jnz invalidKey
+
+			;repeat for next char
+			skipIsDigit:
+			inc edx
+		LOOP checkKey
+
+    ret
+handleKey ENDP
+;----------------    End handleKey   ----------------
 
 
 
@@ -619,33 +655,39 @@ combine ENDP
 ;----------------- Start split -----------------
 split PROC
 
+    ;splitOut[0] = first char in values[0] ;splitOut[1] = second char in values[0]
+    ;splitOut[2] = third char in values[0] ;splitOut[3] = fourth char in values[0]
+    ;-----------------------------------------------------------------------------
+    ;splitOut[4] = first char in values[1] ;splitOut[5] = second char in values[1]
+    ;splitOut[6] = third char in values[1] ;splitOut[7] = fourth char in values[1]
+
     ;splitting first 4 chars
+    mov eax, values[0]
 
-    mov eax, [values] 
-    mov [splitOut], al ; splitOut[0] = first char in values[0]
+    lea ebx, splitOut ; ebx = offset splitOut
+    mov ecx, 2 ;counter of outerloop
+    splitOuterLoop:
+        
+        mov edx, ecx ;storing the counter of outerloop in edx
 
-    shr eax, 8
-    mov [splitOut+1], al ; splitOut[1] = second char in values[0]
+        mov ecx, 2 ;setting counter of inner loop
+        splitInnerLoop:
 
-    shr eax, 8
-    mov [splitOut+2], al ; splitOut[2] = third char in values[0]
+                mov [ebx], al
+                inc ebx
 
-    shr eax, 8
-    mov [splitOut+3], al ; splitOut[3] = fourth char in values[0]
+                mov [ebx], ah
+                inc ebx
 
+                shr eax, 16
 
-    ;splitting second 4 chars
-    mov eax, [values+4]
-    mov [splitOut+4], al ; splitOut[4] = first char in values[1]
+        LOOP splitInnerLoop
 
-    shr eax, 8
-    mov [splitOut+5], al ; splitOut[5] = second char in values[1]
+        ;splitting second 4 chars
+        mov eax, values[4]
 
-    shr eax, 8
-    mov [splitOut+6], al ; splitOut[6] = third char in values[1]
-
-    shr eax, 8
-    mov [splitOut+7], al ; splitOut[7] = fourth char in values[1]
+        mov ecx, edx ;putting the counter of outer loop back in ecx
+  LOOP splitOuterLoop
 
     ret
 

@@ -43,7 +43,8 @@ chars.
 ![Split](https://user-images.githubusercontent.com/47731377/104136771-e2361500-53a0-11eb-9d02-daec71d0d59f.png)
 ### Decryption algorithm 
 ![Decryption](https://user-images.githubusercontent.com/47731377/104136776-ed894080-53a0-11eb-870a-329aab1efbe7.png)
-﻿### UPGRADE CODE TO WORK ON MULTIPLE BIT BLOCKS ####
+
+### UPGRADE CODE TO WORK ON MULTIPLE BIT BLOCKS ####
 
 #### Steps to implement this feature
 * Split the input into blocks of 8 chars.
@@ -59,7 +60,16 @@ other strings must be appended with (0x00)***
 * Message asks the user if he want to decrypt
   the text or not after printing the encrypted one.
 * Message asks the user if he want to encrypt another text.
-* 
+
 ![Demo](https://user-images.githubusercontent.com/47731377/104136786-f8dc6c00-53a0-11eb-9965-f2bc7f26b13b.gif)
 
 
+### TESTING THE PROGRAM :
+
+Bug Description | Issue Number | Bug Status
+--------------- |--------------|-----------
+Bug in main.asm when a char is encrypted to '\0' (NULL char)| [#38](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/38) | [Solved ✔](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/38#issuecomment-756814270)
+Bug in main.asm when a char is encrypted to ('\b' or '\f' or '\r')| [#39](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/39) | [Solved ✔](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/39#issuecomment-756826204)
+Bug in main.asm when we enter a large string then run the program again with a smaller size string the encryption output is wrong| [#42](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/42) | [Solved ✔](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/42#issuecomment-756999157)
+Bug in main.asm when we enter a large string then run the program again with a smaller size string the encryption output is wrong| [#43](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/43) | [Solved ✔](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/43#issuecomment-757290546)
+Bug in main.asm when we enter a large string then enter another string with lower size the encryption outputs wrong values| [#47](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/47) | [Solved ✔](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/47#issuecomment-757371521)

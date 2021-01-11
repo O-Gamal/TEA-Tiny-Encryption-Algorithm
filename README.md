@@ -73,3 +73,14 @@ Bug in main.asm when a char is encrypted to ('\b' or '\f' or '\r')| [#39](https:
 Bug in main.asm when we enter a large string then run the program again with a smaller size string the encryption output is wrong| [#42](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/42) | [Solved ✔](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/42#issuecomment-756999157)
 Bug in main.asm when we enter a large string then run the program again with a smaller size string the encryption output is wrong| [#43](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/43) | [Solved ✔](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/43#issuecomment-757290546)
 Bug in main.asm when we enter a large string then enter another string with lower size the encryption outputs wrong values| [#47](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/47) | [Solved ✔](https://github.com/O-Gamal/TEA-Tiny-Encryption-Algorithm/issues/47#issuecomment-757371521)
+
+
+### Handling exceptions for key inputs
+![Handlingkey](https://user-images.githubusercontent.com/47731377/104136795-085bb500-53a1-11eb-84f2-87f9d2943a4a.gif)
+
+### Team Members:
+> * Omar Gamal : [@O-Gamal]( https://github.com/O-Gamal )
+> * Mariam Gad : [@Mariamgad]( https://github.com/Mariamgad)
+> * Mostafa Amin : [@M0stafaAmin]( https://github.com/M0stafaAmin )
+> * Mostafa Ayman : [@MostafaAE]( https://github.com/MostafaAE)
+> * Mostafa Saad  : [@MostafaSaad7]( https://github.com/MostafaSaad7)

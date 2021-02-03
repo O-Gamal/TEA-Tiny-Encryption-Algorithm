@@ -20,7 +20,7 @@ In our project transmitted data, be encrypted and decrypted using One of most ef
 * TEA >> Then upgrade this code to work on multiple 64-bit blocks.
 
 ----------------------------------------------------------------------------
-#### Implement tea in assembly  
+### Implement TEA in assembly  
 
 ### Combine
 
@@ -28,7 +28,7 @@ In our project transmitted data, be encrypted and decrypted using One of most ef
 
 * The input is 8 chars so we need array of two integers
 
-![Combine](https://user-images.githubusercontent.com/47731377/104136740-b2870d00-53a0-11eb-9ca1-1dc2c901d140.png)
+![Combine](https://user-images.githubusercontent.com/47731377/104490362-6ffc4500-55d9-11eb-9043-b95c38685258.png)
 
 ### Encryption algorithm 
 ![Encryption](https://user-images.githubusercontent.com/47731377/104136762-cc285480-53a0-11eb-9609-f595af29ff94.png)
@@ -55,6 +55,9 @@ chars.
 
 ***This code works fine with a string of multiples of 8,
 other strings must be appended with (0x00)***
+
+### TEA Demo animated video ⬇⬇⬇
+[![Watch the Demo Animated Video](https://user-images.githubusercontent.com/47731377/104492169-ef8b1380-55db-11eb-8834-5a52d81215c8.png)](https://youtu.be/AzDDi_b19N8)
 
 ### UPGRADE CODE TO BE INTERACTIVE
 * Message asks the user if he want to decrypt
